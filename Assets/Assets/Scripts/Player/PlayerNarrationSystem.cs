@@ -12,7 +12,7 @@ public class PlayerNarrationSystem : MonoBehaviour, IObserver
 
     private void Awake()
     {
-        
+        _playerSubject = PlayerStatus.Instance;
         _playerActionHandlers = new Dictionary<PlayerAction, System.Action<float>>()
         {
             { PlayerAction.Heal, HandleHeal },

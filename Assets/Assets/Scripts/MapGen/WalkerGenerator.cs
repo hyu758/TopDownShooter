@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 [System.Serializable]
 public class PrefabWithRate
@@ -13,45 +15,56 @@ public class PrefabWithRate
 
 public class WalkerGenerator : MonoBehaviour
 {
+    
     public enum Grid
     {
         FLOOR,
         WALL,
         EMPTY,
         ENVIRONMENT,
+        SPAWNED
     }
 
     //Variables
     public Grid[,] gridHandler;
     public List<WalkerObject> Walkers;
+    [Header("Map and enviroment")]
     public Tilemap tileMapFloor;
     public Tilemap tileMapWall;
     public Tilemap tileMapBackground;
     public Tile Floor;
     public List<PrefabWithRate> TilePrefabsWithRates;
-    /*public Tile wallTopLeft, wallTopMid, wallTopRight;
-    public Tile wallInlineRight, wallInlineLeft;
-    public Tile wallBottomLeft, wallBottomMid, wallBottomRight;*/
-
     public Tile Wall;
     public Tile Background;
+    
+    [Header("Map Properties")]
     public int MapWidth = 30;
     public int MapHeight = 30;
-
     public int MaximumWalkers = 10;
     public int TileCount = default;
     public float FillPercentage = 0.4f;
     public float WaitTime = 0.05f;
 
-    void Start()
+    private List<Vector3Int> validPos = new List<Vector3Int>();
+    [SerializeField] GameObject deathSlime;
+
+    void Awake()
     {
+        
         InitializeGrid();
         PlaceTilePrefabs();
+        GetValidPos();
+        // SpawnGameObject(deathSlime, 5);
     }
-    void InitializeGrid()
+    public void InitializeGrid()
     {
         gridHandler = new Grid[MapWidth, MapHeight];
-
+        
+        CameraFollow cameraFollow = Camera.main.GetComponent<CameraFollow>();
+        float cameraHeight = 2f * Camera.main.orthographicSize;
+        float cameraWidth = cameraHeight * Screen.width / Screen.height;
+        cameraFollow.SetBounds(MapWidth, MapHeight, cameraWidth, cameraHeight);
+        
         for (int x = 0; x < gridHandler.GetLength(0); x++)
         {
             for (int y = 0; y < gridHandler.GetLength(1); y++)
@@ -291,5 +304,41 @@ public class WalkerGenerator : MonoBehaviour
         }
     }
 
+    void GetValidPos()
+    {
+        for (int i = 0; i < MapHeight; i++)
+        {
+            for (int j = 0; j < MapWidth; j++)
+            {
+                
+                if (gridHandler[i, j] == Grid.FLOOR)
+                {
+                    validPos.Add(new Vector3Int(i, j, 0));
+                }
+            }
+        }
+    }
 
+    public void SpawnGameObject(GameObject gameObject, int numberOfEnemies)
+    {
+        Debug.Log("Size of validPos" + validPos.Count);
+        numberOfEnemies = Math.Min(numberOfEnemies, validPos.Count - 10);
+        if (gameObject == null)
+        {
+            Debug.LogError("Cannot spawn: GameObject is null!");
+            return;
+        }
+
+        for (int i = 0; i < numberOfEnemies; i++)
+        {
+            int randomIndex = Random.Range(0, validPos.Count);
+            Debug.Log(randomIndex);
+            Vector3Int spawnPosition = validPos[randomIndex];
+            Instantiate(gameObject, spawnPosition, Quaternion.identity);
+            gridHandler[spawnPosition.x, spawnPosition.y] = Grid.SPAWNED;
+            validPos.RemoveAt(randomIndex);
+        }
+    }
+    
+    
 }

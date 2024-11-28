@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        rb.MovePosition(rb.position + movement * (PlayerStatus.Instance.CurrentSpeed * Time.fixedDeltaTime));
+        transform.position += new Vector3(movement.x, movement.y, 0) * (PlayerStatus.Instance.CurrentSpeed * Time.deltaTime);
     }
 
     private void HandlePlayerDirection()
