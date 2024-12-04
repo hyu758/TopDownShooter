@@ -20,37 +20,29 @@ public class Rifle : GunBase
 
     private void FixedUpdate()
     {
-        HandleWeaponAnimation();
+        
     }
 
     private void Update()
     {
         RotateWeaponTowardsMouse();  // Xoay súng theo chuột
         shootTimer -= Time.deltaTime;
-
-        if (isReloading)
-            return;
-        if (gunStatus == GunStatus.Shooting && shootTimer <= 0 && !isReloading)
+        if (Input.GetMouseButton(0) && shootTimer < 0)
         {
-            Debug.Log("Ban?");
             Fire();
-            shootTimer = shootInterval;
         }
-
-        shootTimer -= Time.deltaTime;
     }
 
     protected override void Fire()
     {
-        Debug.Log("So dan con lai: " + currentAmmo);
+        shootTimer = shootInterval;
+        if (isReloading) return;
         if (currentAmmo <= 0)
         {
             StartCoroutine(Reload());
             return;
         }
-
-        // Lấy đạn từ pool
-        GameObject bullet = GetBulletFromPool();
+        GameObject bullet = GetBulletFromPool(currentAmmo - 1);
         if (bullet != null)
         {
             Vector3 offset = transform.right * offSet;
@@ -62,14 +54,13 @@ public class Rifle : GunBase
             {
                 rb.velocity = transform.right * ammoSpeed;
             }
-
+            StartCoroutine(BulletLifeTime(bullet, bulletLifeTime));
             currentAmmo--;
 
             if (muzzle != null)
             {
                 StartCoroutine(ShowMuzzleFlash());
             }
-            SetGunStatus(GunStatus.Idle);
         }
     }
 
@@ -80,8 +71,4 @@ public class Rifle : GunBase
         muzzle.SetActive(false);
     }
     
-    private void HandleWeaponAnimation()
-    {
-        animator.SetBool("isMoving", PlayerController.Instance.IsMoving);
-    }
 }

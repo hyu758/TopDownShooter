@@ -23,14 +23,6 @@ public class WeaponController : MonoBehaviour
             SetWeaponActive(currentWeapon);
         }
     }
-    
-    public void SetGunStatus(GunStatus status)
-    {
-        if (currentWeapon != null)
-        {
-            currentWeapon.SetGunStatus(status);
-        }
-    }
     public void SwitchWeapon(GunBase newWeapon)
     {
         if (newWeapon != null)

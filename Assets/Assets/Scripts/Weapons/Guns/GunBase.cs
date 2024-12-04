@@ -12,7 +12,7 @@ public abstract class GunBase : MonoBehaviour
     [SerializeField] protected float reloadTime = 1.5f;
     [SerializeField] protected float ammoSpeed  = 10f;
     [SerializeField] protected float offSet = 1f;
-    
+    [SerializeField] protected float bulletLifeTime = 1.5f;
     protected float shootTimer;
     protected int currentAmmo;
     protected bool isReloading = false;
@@ -70,20 +70,18 @@ public abstract class GunBase : MonoBehaviour
     }
 
     
-    protected GameObject GetBulletFromPool()
+    protected GameObject GetBulletFromPool(int index)
     {
-        foreach (var bullet in activeBullets)
+        if (index > activeBullets.Count - 1)
         {
-            if (!bullet.activeInHierarchy)
-            {
-                bullet.SetActive(true);
-                return bullet;
-            }
+            GameObject newBullet = Instantiate(bulletPrefab);
+            activeBullets.Add(newBullet);
+            return newBullet;
         }
+        GameObject bullet = activeBullets[index];
+        bullet.SetActive(true);
+        return bullet;
         
-        GameObject newBullet = Instantiate(bulletPrefab);
-        activeBullets.Add(newBullet);
-        return newBullet;
     }
     
     protected virtual IEnumerator Reload()
@@ -98,6 +96,12 @@ public abstract class GunBase : MonoBehaviour
 
         isReloading = false;
         gunStatus = GunStatus.Idle;
+    }
+    
+    protected IEnumerator BulletLifeTime(GameObject bullet, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        bullet.SetActive(false);
     }
     
     protected void InitializeBullets()

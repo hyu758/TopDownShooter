@@ -8,7 +8,6 @@ public class LevelManager : MonoBehaviour
     public static LevelManager Instance => instance;
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject deathSlime;
-    [SerializeField] private WalkerGenerator walkerGenerator;
     [SerializeField] private int numberOfEnemies = 5;
     void Awake()
     {
@@ -18,16 +17,6 @@ public class LevelManager : MonoBehaviour
             return;
         }
         instance = this;
-        if (walkerGenerator == null)
-        {
-            Debug.LogWarning("WalkerGenerator is missing");
-        }
-        if (deathSlime == null)
-        {
-            Debug.LogError("DeathSlime chưa được gán trong Inspector!");
-            return;
-        }
-        walkerGenerator.SpawnGameObject(deathSlime, numberOfEnemies);
     }
 
     public GameObject getPlayer()
@@ -52,6 +41,6 @@ public class LevelManager : MonoBehaviour
     }
     void SpawnEnemiesForNextWay()
     {
-        walkerGenerator.SpawnGameObject(player, numberOfEnemies);
+        
     }
 }

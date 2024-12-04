@@ -59,22 +59,6 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("YDir", movement.y);
         isMoving = (movement.x != 0 || movement.y != 0);
         animator.SetBool("isMoving", isMoving);
-
-        if (playerControls.Attacking.Attack.triggered)
-        {
-            weaponController.SetGunStatus(GunStatus.Shooting);
-            
-        }
-        // if (playerControls.Attacking.Attack.IsPressed())
-        // {
-        //     Debug.Log("ALO???");
-        //     weaponController.SetGunStatus(GunStatus.Shooting);
-        // }
-
-        if (playerControls.Attacking.Reload.triggered)
-        {
-            weaponController.SetGunStatus(GunStatus.Reloading);
-        }
     }
 
     private void Move()
