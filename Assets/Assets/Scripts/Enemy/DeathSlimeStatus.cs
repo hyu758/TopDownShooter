@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using Pathfinding;
 using UnityEngine;
 
-public class DeathSlimeStatus : MonoBehaviour
+public class DeathSlimeStatus : EnemyStatus
 {
-    [SerializeField] private int currentHp = 20;
-    private StatusEffectController statusEffectController;
-    private Rigidbody2D rb;
-    void Awake()
+    private AIPath aiPath;
+    void Start()
     {
-        statusEffectController = GetComponent<StatusEffectController>();
-        rb = GetComponent<Rigidbody2D>();
+        aiPath = GetComponent<AIPath>();
+        aiPath.maxSpeed = moveSpeed;
     }
 
     // Update is called once per frame
@@ -18,30 +17,19 @@ public class DeathSlimeStatus : MonoBehaviour
     {
         
     }
+    
 
-    public void HandleHurt(int damage, Vector2 knockbackDirection, float knockbackDistance, float knockbackDuration)
+    protected override IEnumerator Knockback(Vector2 knockbackDirection, float knockbackForce, float knockbackDuration)
     {
-        currentHp -= damage;
-        statusEffectController.Flash(Color.white, 2, 0.05f);
-        StartCoroutine(Knockback(knockbackDirection, knockbackDistance, knockbackDuration));
-        if (currentHp <= 0)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private IEnumerator Knockback(Vector2 knockbackDirection, float knockbackDistance, float knockbackDuration)
-    {
-        float timeElapsed = 0;
-        
-        while (timeElapsed < knockbackDuration)
-        {
-            rb.velocity = knockbackDirection * knockbackDistance;
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-        
+        aiPath.canMove = false;
+        float originalDrag = rb.drag;
+        rb.drag = 0;
+        Debug.Log("Knockback direction " + knockbackDirection + " " + "Knockback force: " + knockbackForce);
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(knockbackDuration);
         rb.velocity = Vector2.zero;
+        rb.drag = originalDrag;
+        aiPath.canMove = true;
     }
 }
 

@@ -61,19 +61,26 @@ public class PlayerStatus : Subject
         StartCoroutine(KnockbackRoutine(knockbackDirection, knockbackDistance, knockbackDuration));
     }
 
-    private IEnumerator KnockbackRoutine(Vector2 knockbackDirection, float knockbackDistance, float knockbackDuration)
+    private IEnumerator KnockbackRoutine(Vector2 knockbackDirection, float knockbackForce, float knockbackDuration)
     {
-        Vector3 start = transform.position;
-        Vector3 target = start + (Vector3)(knockbackDirection.normalized * knockbackDistance);
+        knockbackDirection = knockbackDirection.normalized;
 
-        float elapsedTime = 0f;
-        while (elapsedTime < knockbackDuration)
-        {
-            transform.position = Vector3.Lerp(start, target, elapsedTime / knockbackDuration);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
+        // Lưu Linear Drag ban đầu
+        float originalDrag = rb.drag;
 
-        transform.position = target;
+        // Giảm Linear Drag tạm thời
+        rb.drag = 0;
+
+        // Áp dụng lực knockback
+        rb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+
+        // Chờ hết thời gian knockback
+        yield return new WaitForSeconds(knockbackDuration);
+
+        // Dừng Rigidbody2D
+        rb.velocity = Vector2.zero;
+
+        // Khôi phục Linear Drag
+        rb.drag = originalDrag;
     }
 }

@@ -6,7 +6,6 @@ public class DeathSlimeController : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] float damage = 10f;
-    [SerializeField] float speed = 2f;
     [SerializeField] private float knockbackDistance = 3f;
     [SerializeField] private float knockbackDuration = 0.2f;
     
@@ -16,8 +15,6 @@ public class DeathSlimeController : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Vector2 knockbackDirection = collision.transform.position - transform.position;
-
-
             PlayerStatus.Instance.HandleHurt(damage, knockbackDirection, knockbackDistance, knockbackDuration);
 
         }

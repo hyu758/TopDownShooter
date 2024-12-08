@@ -9,23 +9,24 @@ public class BulletController : MonoBehaviour
     [SerializeField] private int damage = 10;
     [SerializeField] private float knockbackDistance = 4f;
     [SerializeField] private float knockbackDuration = 0.2f;
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D col)
     {
-        if (collision.gameObject.CompareTag("Wall"))
+        Debug.Log("Bullet collided with: " + col.gameObject.name);
+
+        if (col.gameObject.CompareTag("Wall"))
         {
             Instantiate(explosionEffect, transform.position, Quaternion.identity);
-            // gameObject.transform.position = new Vector3(-9999, -9999, gameObject.transform.position.z);
             gameObject.SetActive(false);
         }
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (col.gameObject.CompareTag("Enemy"))
         {
-            Instantiate(explosionEffect, transform.position, Quaternion.identity);
-            Vector2 knockbackDirection = (collision.transform.position - transform.position).normalized;
-            collision.gameObject.GetComponent<DeathSlimeStatus>().HandleHurt(damage, knockbackDirection, knockbackDistance, knockbackDuration);
-            
+            Debug.Log("Bullet hit enemy!");
+
+            Vector2 knockbackDirection = (col.transform.position - transform.position).normalized;
+            var enemy = col.gameObject.GetComponent<EnemyStatus>();
+            enemy.HandleHurt(damage, knockbackDirection, knockbackDistance, knockbackDuration);
             gameObject.SetActive(false);
-            
         }
     }
 }
